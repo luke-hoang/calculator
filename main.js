@@ -1,6 +1,6 @@
-let operator;
-let operand1;
-let operand2;
+let operator = null;
+let operand1 = null;
+let operand2 = null;
 let entry = "";
 
 const operators = Array.from(document.getElementsByClassName("operator"));
@@ -14,7 +14,7 @@ const output = document.getElementById("output");
 operators.forEach(element => {
   element.addEventListener("click", function(event) {
     readEntry();
-    if (operator && !isNaN(operand1) && !isNaN(operand2)) {
+    if (allInputsSet()) {
       operand1 = operation(operator, operand1, operand2);
       operand2 = null;
     }
@@ -26,7 +26,7 @@ operators.forEach(element => {
 
 digits.forEach(element => {
   element.addEventListener("click", function() {
-    if (operator === null) {
+    if (allInputsSet()) {
       clearInputs();
     }
     entry += element.textContent;
@@ -34,10 +34,15 @@ digits.forEach(element => {
   });
 });
 
-decimalPoint.addEventListener("click", function() {
-  if (operator === null) {
-    clearInputs();
+equals.addEventListener("click", function() {
+  readEntry();
+  if (allInputsSet()) {
+    input.innerHTML = getInputs();
+    output.innerHTML = operation(operator, operand1, operand2);
   }
+});
+
+decimalPoint.addEventListener("click", function() {
   if (entry === "") {
     entry += "0.";
   }
@@ -47,28 +52,17 @@ decimalPoint.addEventListener("click", function() {
   output.innerHTML = entry;
 });
 
-equals.addEventListener("click", function() {
-  readEntry();
-  if (operator && !isNaN(operand1) && !isNaN(operand2)) {
-    input.innerHTML = getInputs();
-    operand1 = operation(operator, operand1, operand2);
-    operand2 = null;
-    operator = null;
-    output.innerHTML = operand1;
-  }
-});
-
 clear.addEventListener("click", clearInputs);
 
 function getInputs() {
   let input = "";
-  if (!isNaN(operand1)) {
+  if (Number.parseFloat(operand1)) {
     input += operand1;
   }
-  if (operator != undefined) {
+  if (operator !== null) {
     input += " " + document.getElementById(operator).textContent;
   }
-  if (!isNaN(operand2)) {
+  if (Number.parseFloat(operand2)) {
     input += " " + operand2 + " = ";
   }
   return input;
@@ -76,21 +70,27 @@ function getInputs() {
 
 function readEntry() {
   num = Number.parseFloat(entry);
-  if (isNaN(operand1)) {
+  if (!Number.parseFloat(operand1)) {
     operand1 = num || 0;
   } else {
-    operand2 = num;
+    operand2 = num || operand2;
   }
   entry = "";
 }
 
 function clearInputs() {
-  operator = undefined;
-  operand1 = undefined;
-  operand2 = undefined;
+  operator = null;
+  operand1 = null;
+  operand2 = null;
   entry = "";
   input.innerHTML = "";
   output.innerHTML = "";
+}
+
+function allInputsSet() {
+  return ["add", "subtract", "multiply", "divide"].includes(operator) 
+    && !Number.isNaN(Number.parseFloat(operand1))
+    && !Number.isNaN(Number.parseFloat(operand2));
 }
 
 function operation(operator, a, b) {
@@ -109,7 +109,7 @@ function operation(operator, a, b) {
       result = divide(a, b);
       break;
     default:
-      result = NaN;
+      result = "Operation Error";
       break;
   }
   return Number.parseFloat(result.toFixed(8));
