@@ -2,6 +2,7 @@ let operator = null;
 let operand1 = null;
 let operand2 = null;
 let entry = "";
+let precision = 10;
 
 const operators = Array.from(document.getElementsByClassName("operator"));
 const digits = Array.from(document.getElementsByClassName("digit"));
@@ -26,14 +27,16 @@ operators.forEach(element => {
 
 digits.forEach(element => {
   element.addEventListener("click", function() {
-    if (allInputsSet()) {
-      clearInputs();
-    }
-    entry += element.textContent;
-    if (/^0\d/.test(entry)) {
-      entry = entry.slice(1);
-    }
-    output.innerHTML = entry;
+    if (entry.length < precision) {
+      if (allInputsSet()) {
+        clearInputs();
+      }
+      entry += element.textContent;
+      if (/^0\d/.test(entry)) {
+        entry = entry.slice(1);
+      }
+      output.innerHTML = entry;
+    };
   });
 });
 
@@ -41,7 +44,12 @@ equals.addEventListener("click", function() {
   readEntry();
   if (allInputsSet()) {
     input.innerHTML = getInputs();
-    output.innerHTML = operation(operator, operand1, operand2);
+    result = operation(operator, operand1, operand2);
+    if (result === Infinity) {
+      output.innerHTML = 'Undefined';
+    } else {
+      output.innerHTML = Number(result.toPrecision(precision));
+    }
   }
 });
 
@@ -63,13 +71,13 @@ clear.addEventListener("click", clearInputs);
 function getInputs() {
   let input = "";
   if (!Number.isNaN(Number.parseFloat(operand1))) {
-    input += operand1;
+    input += Number(operand1.toPrecision(precision));
   }
   if (operator !== null) {
     input += " " + document.getElementById(operator).textContent;
   }
   if (!Number.isNaN(Number.parseFloat(operand2))) {
-    input += " " + operand2 + " = ";
+    input += " " + Number(operand2.toPrecision(precision)) + " = ";
   }
   return input;
 }
@@ -78,8 +86,8 @@ function readEntry() {
   num = Number.parseFloat(entry);
   if (operand1 === null) {
     operand1 = num || 0;
-  } else {
-    operand2 = Number.isNaN(num) ? operand2 : num;
+  } else if (!Number.isNaN(num)) {
+    operand2 = num;
   }
   entry = "";
 }
@@ -118,14 +126,12 @@ function operation(operator, a, b) {
       result = "Operation Error";
       break;
   }
-
   if (result === Infinity) {
     operator = null;
     operand1 = null;
     operand2 = null;
     entry = "";
   }
-
   return result;
 }
 
