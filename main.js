@@ -29,6 +29,9 @@ digits.forEach(element => {
     if (allInputsSet()) {
       clearInputs();
     }
+    if (entry.startsWith("0")) {
+      entry = "";
+    }
     entry += element.textContent;
     output.innerHTML = entry;
   });
