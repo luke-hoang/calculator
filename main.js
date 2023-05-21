@@ -29,10 +29,10 @@ digits.forEach(element => {
     if (allInputsSet()) {
       clearInputs();
     }
-    if (entry.startsWith("0")) {
-      entry = "";
-    }
     entry += element.textContent;
+    if (/^0\d/.test(entry)) {
+      entry = entry.slice(1);
+    }
     output.innerHTML = entry;
   });
 });
@@ -46,6 +46,9 @@ equals.addEventListener("click", function() {
 });
 
 decimalPoint.addEventListener("click", function() {
+  if (allInputsSet()) {
+    clearInputs();
+  }
   if (entry === "") {
     entry += "0.";
   }
@@ -59,13 +62,13 @@ clear.addEventListener("click", clearInputs);
 
 function getInputs() {
   let input = "";
-  if (Number.parseFloat(operand1)) {
+  if (!Number.isNaN(Number.parseFloat(operand1))) {
     input += operand1;
   }
   if (operator !== null) {
     input += " " + document.getElementById(operator).textContent;
   }
-  if (Number.parseFloat(operand2)) {
+  if (!Number.isNaN(Number.parseFloat(operand2))) {
     input += " " + operand2 + " = ";
   }
   return input;
@@ -73,10 +76,10 @@ function getInputs() {
 
 function readEntry() {
   num = Number.parseFloat(entry);
-  if (!Number.parseFloat(operand1)) {
+  if (operand1 === null) {
     operand1 = num || 0;
   } else {
-    operand2 = num || operand2;
+    operand2 = Number.isNaN(num) ? operand2 : num;
   }
   entry = "";
 }
@@ -91,7 +94,7 @@ function clearInputs() {
 }
 
 function allInputsSet() {
-  return ["add", "subtract", "multiply", "divide"].includes(operator) 
+  return ["add", "subtract", "multiply", "divide"].includes(operator)
     && !Number.isNaN(Number.parseFloat(operand1))
     && !Number.isNaN(Number.parseFloat(operand2));
 }
@@ -115,7 +118,15 @@ function operation(operator, a, b) {
       result = "Operation Error";
       break;
   }
-  return Number.parseFloat(result.toFixed(8));
+
+  if (result === Infinity) {
+    operator = null;
+    operand1 = null;
+    operand2 = null;
+    entry = "";
+  }
+
+  return result;
 }
 
 function add(a, b) {
