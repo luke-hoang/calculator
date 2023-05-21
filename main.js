@@ -2,8 +2,8 @@ let operator = null;
 let operand1 = null;
 let operand2 = null;
 let entry = "";
-let precision = 10;
 
+const precision = 10;
 const operators = Array.from(document.getElementsByClassName("operator"));
 const digits = Array.from(document.getElementsByClassName("digit"));
 const decimalPoint = document.getElementById("decimal-point");
