@@ -1,2 +1,2 @@
 # Calculator
-A calculator for performing basic operations.
+A [calculator](https://luke-hoang.github.io/calculator/) for performing basic operations.
